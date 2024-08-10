@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>产品详情页</title>
+    <style>
+        body { font-family: Arial, sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; text-align: center; }
+        .image-wrapper { position: relative; display: inline-block; }
+        .product-image { width: 100%; height: auto; display: block; filter: blur(10px); transition: filter 0.3s; }
+        .product-image.loaded { filter: none; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; }
+        .buy-button { background-color: orange; color: white; padding: 15px 30px; border: none; cursor: pointer; font-size: 20px; margin-top: 20px; display: none; }
+    </style>
+    <link rel="preload" href="https://s3.bmp.ovh/imgs/2024/08/10/77c029fc8052c731.jpg" as="image">
+    <link rel="dns-prefetch" href="//s3.bmp.ovh">
+    <link rel="preconnect" href="//s3.bmp.ovh">
+</head>
+<body>
+    <div class="container">
+        <div class="image-wrapper">
+            <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/77c029fc8052c731.jpg" class="product-image lazyload" alt="长图片">
+            <div class="overlay"></div>
+        </div>
+        <button class="buy-button" onclick="window.location.href='tel:4006648088'">下单咨询：400-664-8088</button>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let lazyImages = [].slice.call(document.querySelectorAll("img.lazyload"));
+            let buyButton = document.querySelector(".buy-button");
+
+            if ("IntersectionObserver" in window) {
+                let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            let lazyImage = entry.target;
+                            lazyImage.src = lazyImage.dataset.src;
+                            lazyImage.classList.remove("lazyload");
+                            lazyImage.classList.add("loaded");
+                            lazyImageObserver.unobserve(lazyImage);
+
+                            lazyImage.onload = function() {
+                                buyButton.style.display = "block";
+                            };
+                        }
+                    });
+                });
+                lazyImages.forEach(function(lazyImage) {
+                    lazyImageObserver.observe(lazyImage);
+                });
+            }
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
