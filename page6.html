@@ -8,10 +8,13 @@
         body { font-family: Arial, sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; margin: 0; padding: 0; }
         .container { max-width: 100%; margin: 0 auto; padding: 20px; text-align: center; }
         .image-wrapper { position: relative; display: inline-block; width: 100%; height: auto; }
-        .product-image { width: 100%; height: auto; display: block; filter: blur(10px); transition: filter 0.3s; }
+        .product-image { width: 100%; height: auto; display: block; filter: blur(10px); transition: filter 0.3s; will-change: filter; }
         .product-image.loaded { filter: none; }
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 10; }
         .buy-button { background-color: orange; color: white; padding: 15px 30px; border: none; cursor: pointer; font-size: 20px; margin-top: 20px; display: none; }
+        .progress-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 30px; background: #f3f3f3; border-radius: 15px; overflow: hidden; display: none; }
+        .progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, #ff7e5f, #feb47b); border-radius: 15px; transition: width 0.3s; }
+        .progress-text { position: absolute; width: 100%; text-align: center; line-height: 30px; color: #fff; font-weight: bold; }
     </style>
     <link rel="preload" href="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485.jpg" as="image">
     <link rel="dns-prefetch" href="//s3.bmp.ovh">
@@ -21,28 +24,71 @@
     <div class="container">
         <div class="image-wrapper">
             <div class="overlay"></div>
-            <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485.jpg" class="product-image lazyload" alt="长图片">
+            <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485.jpg" data-src-low="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485_low.jpg" class="product-image lazyload" alt="长图片">
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+                <div class="progress-text">桑普太阳能正在赶来...</div>
+            </div>
         </div>
         <button class="buy-button" onclick="window.location.href='tel:4006648088'">下单咨询：400-664-8088</button>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let lazyImages = [].slice.call(document.querySelectorAll("img.lazyload"));
-            let buyButton = document.querySelector(".buy-button");
+            const lazyImages = [].slice.call(document.querySelectorAll("img.lazyload"));
+            const buyButton = document.querySelector(".buy-button");
+            const progressContainer = document.querySelector(".progress-container");
+            const progressBar = document.querySelector(".progress-bar");
+            const progressText = document.querySelector(".progress-text");
+
+            function loadImage(image, retryCount = 0) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.src = image.dataset.src;
+                    img.onload = () => resolve(image);
+                    img.onerror = () => {
+                        if (retryCount < 1) {
+                            loadImage(image, retryCount + 1).then(resolve).catch(reject);
+                        } else {
+                            img.src = image.dataset.srcLow;
+                            img.onload = () => resolve(image);
+                            img.onerror = () => reject(image);
+                        }
+                    };
+                });
+            }
+
+            function updateProgressBar(percentage) {
+                progressBar.style.width = percentage + '%';
+            }
 
             if ("IntersectionObserver" in window) {
-                let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                const lazyImageObserver = new IntersectionObserver(function(entries, observer) {
                     entries.forEach(function(entry) {
                         if (entry.isIntersecting) {
-                            let lazyImage = entry.target;
-                            lazyImage.src = lazyImage.dataset.src;
-                            lazyImage.classList.remove("lazyload");
-                            lazyImage.classList.add("loaded");
-                            lazyImageObserver.unobserve(lazyImage);
+                            const lazyImage = entry.target;
+                            progressContainer.style.display = 'block';
+                            updateProgressBar(0);
 
-                            lazyImage.onload = function() {
+                            loadImage(lazyImage).then(image => {
+                                image.src = image.dataset.src;
+                                image.classList.remove("lazyload");
+                                image.classList.add("loaded");
+                                lazyImageObserver.unobserve(image);
+                                progressContainer.style.display = 'none';
                                 buyButton.style.display = "block";
-                            };
+                            }).catch(image => {
+                                progressText.textContent = "加载失败，请稍后重试";
+                            });
+
+                            let progress = 0;
+                            const interval = setInterval(() => {
+                                if (progress < 100) {
+                                    progress += 10;
+                                    updateProgressBar(progress);
+                                } else {
+                                    clearInterval(interval);
+                                }
+                            }, 300);
                         }
                     });
                 });
@@ -62,25 +108,26 @@
                     }
                 });
                 img.addEventListener('touchend', function(e) {
-                    let now = new Date().getTime();
+                    const now = new Date().getTime();
                     if (now - lastTouchEnd <= 300) {
                         e.preventDefault();
                     }
                     lastTouchEnd = now;
                 }, false);
             });
-        });
 
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        document.addEventListener('dragstart', function(e) {
-            if (e.target.tagName === 'IMG') {
+            document.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
-            }
+            });
+
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 </body>
 </html>
+
 
