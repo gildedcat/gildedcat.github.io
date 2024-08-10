@@ -17,6 +17,7 @@
         .progress-text { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #000; font-weight: bold; font-size: 12px; z-index: 40; }
         .progress-percentage { position: absolute; top: 0; right: 10px; color: #000; font-weight: bold; z-index: 40; }
     </style>
+    <!-- 预加载图片 -->
     <link rel="preload" href="https://s3.bmp.ovh/imgs/2024/08/10/fac41cd3f3e43bbc.jpg" as="image">
     <link rel="dns-prefetch" href="//s3.bmp.ovh">
     <link rel="preconnect" href="//s3.bmp.ovh">
@@ -25,7 +26,8 @@
     <div class="container">
         <div class="image-wrapper">
             <div class="overlay"></div>
-            <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/fac41cd3f3e43bbc.jpg" data-src-low="https://s3.bmp.ovh/imgs/2024/08/10/fac41cd3f3e43bbc_low.jpg" class="product-image lazyload" alt="长图片" loading="lazy">
+            <!-- 图片的 data-src 和 data-src-low 属性 -->
+            <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/fac41cd3f3e43bbc.jpg" data-src-low="https://s3.bmp.ovh/imgs/2024/08/10/496c34ea71fd96e8_low.jpg" class="product-image lazyload" alt="长图片" loading="lazy">
             <div class="progress-container">
                 <div class="progress-bar"></div>
                 <div class="progress-text">桑普太阳能正在赶来...</div>
@@ -61,15 +63,17 @@
             }
 
             function updateProgressBar(percentage) {
-                progressBar.style.width = percentage + '%';
-                progressPercentage.textContent = percentage + '%';
+                // 确保最大值为99%
+                const displayPercentage = percentage >= 100 ? 99 : percentage;
+                progressBar.style.width = displayPercentage + '%';
+                progressPercentage.textContent = displayPercentage + '%';
             }
 
             function showProgressBar() {
                 progressContainer.style.display = 'block';
                 let progress = 0;
                 const interval = setInterval(() => {
-                    if (progress < 99) {
+                    if (progress < 99) {  // 这里设置最大值为99%
                         progress += 10;
                         updateProgressBar(progress);
                     } else {
@@ -95,7 +99,7 @@
                                 image.classList.remove("lazyload");
                                 image.classList.add("loaded");
                                 lazyImageObserver.unobserve(image);
-                                updateProgressBar(100);
+                                updateProgressBar(99);  // 这里确保加载成功后设置为99%
                                 progressContainer.style.display = 'none';
                                 buyButton.style.display = "block";
                             }).catch(() => {
