@@ -14,8 +14,8 @@
         .buy-button { background-color: orange; color: white; padding: 15px 30px; border: none; cursor: pointer; font-size: 20px; margin-top: 20px; display: none; }
         .progress-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 30px; background: rgba(255, 255, 255, 0.8); border-radius: 15px; overflow: hidden; display: none; z-index: 30; }
         .progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, #ff7e5f, #feb47b); border-radius: 15px; transition: width 0.2s; }
-        .progress-text { position: absolute; top: -40px; width: 100%; text-align: center; line-height: 30px; color: #000; font-weight: bold; font-family: '黑体'; z-index: 40; background: rgba(255, 255, 255, 0.8); }
-        .progress-percentage { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #000; font-weight: bold; z-index: 40; }
+        .progress-text { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #000; font-weight: bold; z-index: 40; }
+        .progress-percentage { position: absolute; top: 0; right: 10px; color: #000; font-weight: bold; z-index: 40; }
     </style>
     <link rel="preload" href="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485.jpg" as="image">
     <link rel="dns-prefetch" href="//s3.bmp.ovh">
@@ -27,8 +27,8 @@
             <div class="overlay"></div>
             <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485.jpg" data-src-low="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485_low.jpg" class="product-image lazyload" alt="长图片" loading="lazy">
             <div class="progress-container">
-                <div class="progress-text">桑普太阳能正在赶来...</div>
                 <div class="progress-bar"></div>
+                <div class="progress-text">桑普太阳能正在赶来...</div>
                 <div class="progress-percentage">0%</div>
             </div>
         </div>
@@ -69,7 +69,7 @@
                 progressContainer.style.display = 'block';
                 let progress = 0;
                 const interval = setInterval(() => {
-                    if (progress < 100) {
+                    if (progress < 99) {
                         progress += 10;
                         updateProgressBar(progress);
                     } else {
@@ -95,6 +95,7 @@
                                 image.classList.remove("lazyload");
                                 image.classList.add("loaded");
                                 lazyImageObserver.unobserve(image);
+                                updateProgressBar(100);
                                 progressContainer.style.display = 'none';
                                 buyButton.style.display = "block";
                             }).catch(() => {
@@ -141,4 +142,3 @@
     </script>
 </body>
 </html>
-
