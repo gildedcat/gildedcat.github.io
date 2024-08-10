@@ -12,9 +12,10 @@
         .product-image.loaded { filter: none; }
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 10; }
         .buy-button { background-color: orange; color: white; padding: 15px 30px; border: none; cursor: pointer; font-size: 20px; margin-top: 20px; display: none; }
-        .progress-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 30px; background: rgba(255, 255, 255, 0.8); border-radius: 15px; overflow: hidden; display: none; z-index: 20; }
+        .progress-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 30px; background: rgba(255, 255, 255, 0.8); border-radius: 15px; overflow: hidden; display: none; z-index: 30; }
         .progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, #ff7e5f, #feb47b); border-radius: 15px; transition: width 0.2s; }
-        .progress-text { position: absolute; top: -40px; width: 100%; text-align: center; line-height: 30px; color: #000; font-weight: bold; font-family: '黑体'; z-index: 30; background: rgba(255, 255, 255, 0.8); }
+        .progress-text { position: absolute; top: -40px; width: 100%; text-align: center; line-height: 30px; color: #000; font-weight: bold; font-family: '黑体'; z-index: 40; background: rgba(255, 255, 255, 0.8); }
+        .progress-percentage { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #000; font-weight: bold; z-index: 40; }
     </style>
     <link rel="preload" href="https://s3.bmp.ovh/imgs/2024/08/10/2fa0e6335099c485.jpg" as="image">
     <link rel="dns-prefetch" href="//s3.bmp.ovh">
@@ -28,6 +29,7 @@
             <div class="progress-container">
                 <div class="progress-text">桑普太阳能正在赶来...</div>
                 <div class="progress-bar"></div>
+                <div class="progress-percentage">0%</div>
             </div>
         </div>
         <button class="buy-button" onclick="window.location.href='tel:4006648088'">下单咨询：400-664-8088</button>
@@ -39,6 +41,7 @@
             const progressContainer = document.querySelector(".progress-container");
             const progressBar = document.querySelector(".progress-bar");
             const progressText = document.querySelector(".progress-text");
+            const progressPercentage = document.querySelector(".progress-percentage");
 
             function loadImage(image, retryCount = 0) {
                 return new Promise((resolve, reject) => {
@@ -46,7 +49,7 @@
                     img.src = image.dataset.src;
                     img.onload = () => resolve(image);
                     img.onerror = () => {
-                        if (retryCount < 1) {
+                        if (retryCount < 3) {
                             loadImage(image, retryCount + 1).then(resolve).catch(reject);
                         } else {
                             img.src = image.dataset.srcLow;
@@ -59,6 +62,7 @@
 
             function updateProgressBar(percentage) {
                 progressBar.style.width = percentage + '%';
+                progressPercentage.textContent = percentage + '%';
             }
 
             function showProgressBar() {
@@ -72,6 +76,11 @@
                         clearInterval(interval);
                     }
                 }, 200);
+            }
+
+            function resetProgressBar() {
+                progressBar.style.width = '0%';
+                progressPercentage.textContent = '0%';
             }
 
             if ("IntersectionObserver" in window) {
@@ -90,6 +99,8 @@
                                 buyButton.style.display = "block";
                             }).catch(() => {
                                 progressText.textContent = "加载失败，请稍后重试";
+                                resetProgressBar();
+                                showProgressBar();
                             });
                         }
                     });
@@ -130,3 +141,4 @@
     </script>
 </body>
 </html>
+
