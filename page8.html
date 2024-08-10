@@ -17,7 +17,7 @@
         .progress-text { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #000; font-weight: bold; font-size: 12px; z-index: 40; }
         .progress-percentage { position: absolute; top: 0; right: 10px; color: #000; font-weight: bold; z-index: 40; }
     </style>
-    <!-- 预加载图片 --><!-- 在这里设置图片url！！ -->
+    <!-- 预加载图片 -->
     <link rel="preload" href="https://s3.bmp.ovh/imgs/2024/08/10/496c34ea71fd96e8.jpg" as="image">
     <link rel="dns-prefetch" href="//s3.bmp.ovh">
     <link rel="preconnect" href="//s3.bmp.ovh">
@@ -26,7 +26,7 @@
     <div class="container">
         <div class="image-wrapper">
             <div class="overlay"></div>
-            <!-- 图片的 data-src 和 data-src-low 属性 --><!-- 在这里设置图片url！！ -->
+            <!-- 图片的 data-src 和 data-src-low 属性 -->
             <img src="placeholder.jpg" data-src="https://s3.bmp.ovh/imgs/2024/08/10/496c34ea71fd96e8.jpg" data-src-low="https://s3.bmp.ovh/imgs/2024/08/10/496c34ea71fd96e8_low.jpg" class="product-image lazyload" alt="长图片" loading="lazy">
             <div class="progress-container">
                 <div class="progress-bar"></div>
@@ -63,8 +63,10 @@
             }
 
             function updateProgressBar(percentage) {
-                progressBar.style.width = percentage + '%';
-                progressPercentage.textContent = percentage + '%';
+                // 确保最大值为99%
+                const displayPercentage = percentage >= 100 ? 99 : percentage;
+                progressBar.style.width = displayPercentage + '%';
+                progressPercentage.textContent = displayPercentage + '%';
             }
 
             function showProgressBar() {
@@ -144,3 +146,4 @@
     </script>
 </body>
 </html>
+
